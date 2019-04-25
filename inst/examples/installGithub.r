@@ -17,7 +17,7 @@ doc <- "Usage: installGithub.r [-h] [-x] [-d DEPS] [-u UPDATE] [-n NCPUS] [-r RE
 
 -d --deps DEPS       install suggested dependencies as well? [default: NA]
 -u --update UPDATE   update dependencies? [default: TRUE]
--n --ncpus NCPUS    number of processes to use for parallel install [default: getOption]
+-n --ncpus NCPUS     number of processes to use for parallel install [default: getOption]
 -r --repos REPOS     repositor(y|ies) to use if deps required [default: getOption]
 -h --help            show this help text
 -x --usage           show help and short example usage"
@@ -63,12 +63,17 @@ if (opt$deps == "TRUE" || opt$deps == "FALSE") {
     opt$deps <- NA
 }
 
-if (opt$ncpus == "getOption") {
-    opt$ncpus <- getOption("Ncpus", 1L)
-} else if (opt$ncpus == "-1") {
+ncpus_old <- getOption("Ncpus", 1L)
+on.exit(options(ncpus = ncpus_old))
+
+if (opt$ncpus == "-1") {
     ## parallel comes with R 2.14+
-    opt$ncpus <- max(1L, parallel::detectCores())
+    options(Ncpus = max(1L, parallel::detectCores()))
+} else if (opt$ncpus != "getOption") {
+    options(Ncpus = opt$ncpus)
 }
+
+
 
 if (length(opt$repos) == 1 && opt$repos == "getOption") {
     ## as littler can now read ~/.littler.r and/or /etc/littler.r we can preset elsewhere
