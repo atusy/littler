@@ -77,4 +77,4 @@ if (length(opt$repos) == 1 && opt$repos == "getOption") {
 
 opt$update <- as.logical(opt$update)
 
-invisible(sapply(opt$GHREPOS, function(r) install_github(r, dependencies = opt$deps, upgrade = opt$update, repos = opt$repos, Ncpus = opt$ncpus)))
+invisible(install_github(opt$GHREPOS, dependencies = opt$deps, upgrade = opt$update, repos = opt$repos, Ncpus = opt$ncpus))
